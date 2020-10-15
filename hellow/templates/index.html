@@ -22,6 +22,14 @@
 
 
     <style>
+        .text-colour {
+            color: blue;
+        }
+
+        tbody tr {
+            cursor: pointer;
+        }
+
         small {
             font-size: xx-small;
             flex-wrap: wrap;
@@ -35,7 +43,6 @@
             color: rgb(92, 4, 4);
             font-weight: bold;
             border-width: 20px;
-            height: 52px;
             border-color: tomato;
             background-color: whitesmoke;
         }
@@ -66,21 +73,40 @@
                     markers = [];
 
                     var data = JSON.parse(data);
-                    data.forEach(element => {
+
+                    for (i = 0; i < data.length; i++) {
                         var pos = {
-                            lat: element.lat,
-                            lng: element.lng
+                            lat: data[i]['lat'],
+                            lng: data[i]['lng']
+                        };
+                        var infowindow = new google.maps.InfoWindow();
+                        let defaultImage =
+                            "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgdmlld0JveD0iMCAwIDUxMi4wMzYgNTEyLjAzNiIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNTEyLjAzNiA1MTIuMDM2OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMSkiPg0KCTxwYXRoIHN0eWxlPSJmaWxsOiM1QjVCNUI7IiBkPSJNMTUxLjEwNSwzNDQuMjk1YzAsMjkuMjU1LTIzLjcxMSw1Mi45NjYtNTIuOTY2LDUyLjk2NnMtNTIuOTY2LTIzLjcxMS01Mi45NjYtNTIuOTY2DQoJCWMwLTI5LjI1NSwyMy43MTEtNTIuOTY2LDUyLjk2Ni01Mi45NjZTMTUxLjEwNSwzMTUuMDQxLDE1MS4xMDUsMzQ0LjI5NSIvPg0KCTxwYXRoIHN0eWxlPSJmaWxsOiNCMkIyQjI7IiBkPSJNMTE1Ljc5NSwzNDQuMjk1YzAsOS43NTQtNy45MDEsMTcuNjU1LTE3LjY1NSwxNy42NTVzLTE3LjY1NS03LjkwMS0xNy42NTUtMTcuNjU1DQoJCWMwLTkuNzU0LDcuOTAxLTE3LjY1NSwxNy42NTUtMTcuNjU1UzExNS43OTUsMzM0LjU0MSwxMTUuNzk1LDM0NC4yOTUiLz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojNUI1QjVCOyIgZD0iTTQ2OC44OTgsMzQ0LjI5NWMwLDI5LjI1NS0yMy43MTEsNTIuOTY2LTUyLjk2Niw1Mi45NjZjLTI5LjI1NSwwLTUyLjk2Ni0yMy43MTEtNTIuOTY2LTUyLjk2Ng0KCQljMC0yOS4yNTUsMjMuNzExLTUyLjk2Niw1Mi45NjYtNTIuOTY2QzQ0NS4xODcsMjkxLjMzLDQ2OC44OTgsMzE1LjA0MSw0NjguODk4LDM0NC4yOTUiLz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojQjJCMkIyOyIgZD0iTTQzMy41ODgsMzQ0LjI5NWMwLDkuNzU0LTcuOTAxLDE3LjY1NS0xNy42NTUsMTcuNjU1Yy05Ljc1NCwwLTE3LjY1NS03LjkwMS0xNy42NTUtMTcuNjU1DQoJCWMwLTkuNzU0LDcuOTAxLTE3LjY1NSwxNy42NTUtMTcuNjU1QzQyNS42ODcsMzI2LjY0LDQzMy41ODgsMzM0LjU0MSw0MzMuNTg4LDM0NC4yOTUiLz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojODZDMjUwOyIgZD0iTTM5MS4xMjYsMTg5LjIyN2wtMzAuNDgyLTQ5LjUzMmMtOS41MjUtMTUuNDg0LTI2LjQxMi0yNC45Mi00NC41ODgtMjQuOTJIMTM2LjI0Nw0KCQljLTE4LjE5NCwwLTM1LjA4MSw5LjQ1NC00NC42MDYsMjQuOTU2bC00My45LDcxLjQ3N2MtNywxMS4zODgtMTkuNDIxLDE4LjMyNi0zMi43ODYsMTguMzI2aC0wLjQyNA0KCQljLTcuNTM5LDAtMTMuNTUsNi4wMDMtMTMuNTMzLDEzLjQ0NGMwLjAxOCwxOS41LDAuMDI2LDU1Ljg2MSwwLjAzNSw3OS4zMDdjMCwxMi4xOTEsOS44NzgsMjIuMDA3LDIyLjA2LDIyLjAwN2gyMi4wNzgNCgkJYzAtMjkuMjQ2LDIzLjcxMS01Mi45NjYsNTIuOTY2LTUyLjk2NnM1Mi45NjYsMjMuNzIsNTIuOTY2LDUyLjk2NmgyMTEuODYyYzAtMjkuMjQ2LDIzLjcxMS01Mi45NjYsNTIuOTY2LTUyLjk2Ng0KCQlzNTIuOTY2LDIzLjcyLDUyLjk2Niw1Mi45NjZoMTcuMjg0YzE0LjgzLDAsMjYuODUzLTEyLjAyMywyNi44NTMtMjYuODU0di03NC40OTZjMC03LjQwNi02LjAwMy0xMy40MDktMTMuNDA5LTEzLjQwOWgtMzYuMzYxDQoJCUM0MzMuODUyLDIyOS41MzQsNDA2LjUzOSwyMTQuMjgsMzkxLjEyNiwxODkuMjI3Ii8+DQoJPHBhdGggc3R5bGU9ImZpbGw6I0U2RTZFNjsiIGQ9Ik0zOTEuMTI2LDE4OS4yMjZsLTI0LjA4Mi0zOS4xNDJIMTMxLjkzMWMtNC4wMzQsMC03LjMwOSwzLjI3NS03LjMwOSw3LjMxOHYzOC4zMzgNCgkJYzAsNC4wNDMsMy4yNzUsNy4zMDksNy4zMDksNy4zMDloMjcwLjAzNkMzOTcuOTU5LDE5OC44NCwzOTQuMjQzLDE5NC4yOTMsMzkxLjEyNiwxODkuMjI2Ii8+DQoJPHBhdGggc3R5bGU9ImZpbGw6IzVCNUI1QjsiIGQ9Ik0yNDguMjA5LDIwMy4wNTRoMTcuNjU1di01Mi45NjZoLTE3LjY1NVYyMDMuMDU0eiIvPg0KCTxnPg0KCQk8cGF0aCBzdHlsZT0iZmlsbDojNjI4RDNBOyIgZD0iTTMwMS4xNzQsMjU2LjAxOWgtNDQuMTM4Yy00Ljg3MywwLTguODI4LTMuOTQ2LTguODI4LTguODI4YzAtNC44ODIsMy45NTUtOC44MjgsOC44MjgtOC44MjgNCgkJCWg0NC4xMzhjNC44NzMsMCw4LjgyOCwzLjk0Niw4LjgyOCw4LjgyOEMzMTAuMDAyLDI1Mi4wNzQsMzA2LjA0NywyNTYuMDE5LDMwMS4xNzQsMjU2LjAxOSIvPg0KCQk8cGF0aCBzdHlsZT0iZmlsbDojNjI4RDNBOyIgZD0iTTMwMS4xNzQsMjczLjY3NWMtNC44NzMsMC04LjgyOC0zLjk0Ni04LjgyOC04LjgyOHYtMTcuNjU1YzAtNC44ODIsMy45NTUtOC44MjgsOC44MjgtOC44MjgNCgkJCXM4LjgyOCwzLjk0Niw4LjgyOCw4LjgyOHYxNy42NTVDMzEwLjAwMiwyNjkuNzI5LDMwNi4wNDcsMjczLjY3NSwzMDEuMTc0LDI3My42NzUiLz4NCgkJPHBhdGggc3R5bGU9ImZpbGw6IzYyOEQzQTsiIGQ9Ik01MTMuMDM2LDI2NC44NDdoLTM1LjMxYy00Ljg4MiwwLTguODI4LDMuOTQ2LTguODI4LDguODI4czMuOTQ2LDguODI4LDguODI4LDguODI4aDM1LjMxVjI2NC44NDd6DQoJCQkiLz4NCgkJPHBhdGggc3R5bGU9ImZpbGw6IzYyOEQzQTsiIGQ9Ik0zNi4zNDcsMjY0Ljg0N0gxLjAxOWMwLDUuNjY3LDAsMTEuNTgyLDAuMDA5LDE3LjY1NWgzNS4zMTljNC44NzMsMCw4LjgyOC0zLjk0Niw4LjgyOC04LjgyOA0KCQkJUzQxLjIxOSwyNjQuODQ3LDM2LjM0NywyNjQuODQ3Ii8+DQoJPC9nPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=";
+
+                        var image = {
+                            url: defaultImage,
+                            size: new google.maps.Size(220, 220),
+                            scaledSize: new google.maps.Size(32, 32),
+                            origin: new google.maps.Point(0, 0),
+                            anchor: new google.maps.Point(16, 16)
                         };
                         var marker = new google.maps.Marker({
                             position: pos,
+                            icon: image,
                             map: map,
-
-                            title: "Show " + element.imei
-
+                            title: "" + data[i]['imei']
                         });
 
+
+                        google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                            return function () {
+                                infowindow.setContent((data[i]['imei']).toString());
+                                infowindow.open(map, marker);
+                            }
+                        })(marker, i));
+
                         markers.push(marker);
-                    });
+                    }
                 });
             }, 3000);
         }
@@ -111,8 +137,9 @@
                         }
                         if (element.status == "online") {
                             $('.device_list>tbody').append(
-                                "<tr>" +
-                                "<td> <small>" + element.imei +
+                                "<tr onclick='realtimeData(" + element.imei +
+                                ")'>" +
+                                "<td> <small class='text-colour'>" + element.imei +
                                 "</small> </td>" +
                                 "<td> <small>" + element.name +
                                 "</small> </td>" +
@@ -126,8 +153,9 @@
                             );
                         } else {
                             $('.device_list>tbody').append(
-                                "<tr>" +
-                                "<td> <small>" + element.imei +
+                                "<tr onclick='realtimeData(" + element.imei +
+                                ")'>" +
+                                "<td> <small class='text-colour'>" + element.imei +
                                 "</small> </td>" +
                                 "<td> <small>" + element.name +
                                 "</small> </td>" +
@@ -179,91 +207,9 @@
                 }
             }, 3000);
 
-
         });
     </script>
-    <script>
-        $(document).ready(function () {
-            $.get("/8615336030196003", function (data, status) {
-                dataDevice = JSON.parse(data);
-                console.log(dataDevice)
-            });
 
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            var ctx = document.getElementById("myChart").getContext("2d");
-
-            var data = {
-                labels: ["January", "February", "March", "April", "May", "June", "July"],
-                datasets: [{
-                    label: "My First dataset",
-                    fillColor: "rgba(220,220,220,0.2)",
-                    strokeColor: "rgba(220,220,220,1)",
-                    pointColor: "rgba(220,220,220,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(220,220,220,1)",
-                    data: [65, 59, 80, 81, 56, 55, 40]
-                }, {
-                    label: "My Second dataset",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: [28, 48, 40, 19, 86, 27, 90]
-                }]
-            };
-            var options = {
-                animation: false,
-                //Boolean - If we want to override with a hard coded scale
-                scaleOverride: true,
-                //* Required if scaleOverride is true *
-                //Number - The number of steps in a hard coded scale
-                scaleSteps: 10,
-                //Number - The value jump in the hard coded scale
-                scaleStepWidth: 10,
-                //Number - The scale starting value
-                scaleStartValue: 0
-            };
-
-            var myLineChart = new Chart(ctx).Line(data, options);
-
-            setInterval(function () {
-                setData(data.datasets[0].data);
-                setData(data.datasets[1].data);
-                setLabels(data.labels);
-
-                var myLineChart = new Chart(ctx).Line(data, options);
-            }, 2000);
-
-            function setLabels(labels) {
-                var nextMonthIndex = months.indexOf(labels[labels.length - 1]) + 1;
-                var nextMonthName = months[nextMonthIndex] != undefined ? months[nextMonthIndex] : "January";
-                labels.push(nextMonthName);
-                labels.shift();
-            }
-
-            function setData(data) {
-                data.push(Math.floor(Math.random() * 100) + 1);
-                data.shift();
-            }
-
-            function convertMonthNameToNumber(monthName) {
-                var myDate = new Date(monthName + " 1, 2016");
-                var monthDigit = myDate.getMonth();
-                return isNaN(monthDigit) ? 0 : (monthDigit + 1);
-            }
-
-            var months = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-
-        });
-    </script>
     <script>
         // Create a client instance
         var hostname = "broker.mqttdashboard.com";
@@ -300,9 +246,85 @@
             });
         }
 
+        var labels = [];
+        var dataArray = [];
+        var data = {
+            labels: labels,
+            datasets: [{
+                label: "Device Realtime Data",
+                fillColor: "rgba(220,220,220,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: dataArray
+            }]
+        };
+        var options = {
+            animation: false,
+
+            scales: {
+                yAxes: [{
+                    labelString: "Speed"
+                }]
+            }
+        };
+        var ctx;
+
+        $(document).ready(function () {
+
+            ctx = document.getElementById("myChart").getContext("2d");
+            var myLineChart = new Chart(ctx).Line(data, options);
+
+            $.get("/8615336030196001", function (deviceData, status) {
+                var dataDevice = JSON.parse(deviceData);
+
+                dataDevice.forEach(element => {
+                    labels.push((new Date(element.timeStamp * 1000)).toString().slice(0, 21));
+                    dataArray.push(element.speed);
+                });
+
+                data.datasets[0].data = dataArray;
+                data.labels = labels;
+
+                var myLineChart = new Chart(ctx).Line(data, options);
+            });
+        });
+
         // called when a message arrives
+        function realtimeData(imei) {
+            console.log(imei);
+            $.get("/" + imei, function (deviceData, status) {
+                console.log(deviceData);
+                var dataDevice = JSON.parse(deviceData);
+
+                dataDevice.forEach(element => {
+                    labels.push((new Date(element.timeStamp * 1000)).toString().slice(0, 21));
+                    dataArray.push(element.speed);
+                });
+
+                data.datasets[0].data = dataArray;
+                data.labels = labels;
+
+                var myLineChart = new Chart(ctx).Line(data, options);
+            });
+        }
+
         function onMessageArrived(message) {
-            console.log("onMessageArrived:" + message.payloadString);
+            console.log(typeof message.payloadString)
+            var jsonObject = JSON.parse(message.payloadString);
+
+            var changeData = data.datasets[0].data;
+            var changeLabel = data.labels;
+
+            changeData.push(jsonObject.speed);
+            changeData.shift();
+
+            changeLabel.push((new Date(jsonObject.timeStamp * 1000)).toString().slice(0, 21));
+            changeLabel.shift();
+
+            var myLineChart = new Chart(ctx).Line(data, options);
         }
     </script>
 </head>
@@ -358,7 +380,8 @@
                 <div id="piechart"></div>
             </div>
             <div class="col-md-8">
-                <canvas id="myChart" height="320" width="930"></canvas>
+                <p class="text-center"> <b class="text-color">Realtime Data</b> <br> x-axis=Speed::y-axis=Time</p>
+                <canvas id="myChart" height="400" width="930"></canvas>
             </div>
         </div>
 
