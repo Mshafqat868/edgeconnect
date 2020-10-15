@@ -6,7 +6,7 @@ from flask_pymongo import MongoClient
 import datetime
 import paho.mqtt.client as mqtt
 from bson.json_util import loads, dumps
-
+import json
 
 cluster = MongoClient(
     'mongodb+srv://shafqat:shafqat@cluster0.rtgng.azure.mongodb.net/edgeconnect?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE', 27017)
@@ -36,20 +36,22 @@ def deviceList():
 
 @app.route('/<id>')
 def devicetelemetery(id):
-    cursor = list(db[str(id)].find({}))
+    counter = int(db[str(id)].count())
+    cursor = list(db[str(id)].find({}).skip(counter-5))
+
     cursor = dumps(cursor)
     return cursor
 # Get environment details
 
 
-@app.route('/telemeteryData')
+@ app.route('/telemeteryData')
 def telemetery_data():
     cursor = list(db['telemetery'].find({}))
     cursor = dumps(cursor)
     return cursor
 
 
-@app.route('/telemetery', methods=['POST'])
+@ app.route('/telemetery', methods=['POST'])
 def telemetery():
     print(request.json['imei'])
     db['telemetery'].update_one(
@@ -58,6 +60,8 @@ def telemetery():
         request.json).inserted_id
     print("here")
     print(insert_u)
+    collection.update_one(
+        {"imei": request.json['imei']}, {"$set": {"timeStamp": request.json['timeStamp'], "status": request.json['status']}}, upsert=True).raw_result
     return str(insert_u) + " has been added"
 
 
@@ -76,23 +80,29 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("shafqat")
+    client.subscribe("edgeconnect/telemetery")
 
 # The callback for when a PUBLISH message is received from the server.
 
 
 def on_message(client, userdata, msg):
-    print(msg.payload.decode('utf-8'))
-    if msg.payload.decode('utf-8') == "shafqat":
-        print("compared successful")
-
-    cluster.close()
+    msg = msg.payload.decode('utf-8')
+    msg = json.loads(msg)
+    print(msg['imei'])
+    db['telemetery'].update_one(
+        {"imei": msg['imei']}, {"$set": msg}, upsert=True)
+    insert_u = db[str(msg['imei'])].insert_one(
+        msg).inserted_id
+    collection.update_one(
+        {"imei": msg['imei']}, {"$set": {"timeStamp": msg['timeStamp']*1000, "status": msg['status']}}, upsert=True).raw_result
+    print("here")
+    print(insert_u)
 
 
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
-client.connect("broker.hivemq.com", 1883, 60)
+client.connect("broker.mqttdashboard.com", 1883, 60)
 client.loop_start()
 if __name__ == '__main__':
     app.run()

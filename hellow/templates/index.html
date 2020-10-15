@@ -31,11 +31,13 @@
 
         #custom {
             text-align: center;
-            background-color: rgb(146, 17, 39);
-            color: white;
+            background-color: white;
+            color: rgb(92, 4, 4);
             font-weight: bold;
             border-width: 20px;
             height: 52px;
+            border-color: tomato;
+            background-color: whitesmoke;
         }
     </style>
 
@@ -180,7 +182,15 @@
 
         });
     </script>
+    <script>
+        $(document).ready(function () {
+            $.get("/8615336030196003", function (data, status) {
+                dataDevice = JSON.parse(data);
+                console.log(dataDevice)
+            });
 
+        });
+    </script>
     <script>
         $(document).ready(function () {
             var ctx = document.getElementById("myChart").getContext("2d");
@@ -301,8 +311,8 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-4" style="height: 353px; overflow: auto">
-                <table class="table device_list" style="text-orientation: upright;">
-                    <thead class="thead-light">
+                <table class="table device_list" style="text-orientation: upright;text-align: center;">
+                    <thead class="thead-dark">
                         <tr>
                             <th>IMEI</th>
                             <th>Name</th>
