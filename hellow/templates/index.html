@@ -277,7 +277,8 @@
 
             ctx = document.getElementById("myChart").getContext("2d");
             var myLineChart = new Chart(ctx).Line(data, options);
-
+            dataArray = [];
+            labels = [];
             $.get("/8615336030196001", function (deviceData, status) {
                 var dataDevice = JSON.parse(deviceData);
 
@@ -296,6 +297,8 @@
         // called when a message arrives
         function realtimeData(imei) {
             console.log(imei);
+            dataArray = [];
+            labels = [];
             $.get("/" + imei, function (deviceData, status) {
                 console.log(deviceData);
                 var dataDevice = JSON.parse(deviceData);
